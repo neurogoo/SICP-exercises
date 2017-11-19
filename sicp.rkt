@@ -266,3 +266,75 @@
           structure)))
   (+ (weight (left-branch mobile))
      (weight (right-branch mobile))))
+;Exercise 2.30
+
+(define (square-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (* tree tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+(define (square-tree-map tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree-map sub-tree)
+             (* sub-tree sub-tree)))
+       tree))
+; Exercise 2.31
+
+(define (square num)
+  (* num num))
+
+(define (tree-map func tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map func sub-tree)
+             (func sub-tree)))
+       tree))
+(define (new-square-tree tree)
+  (tree-map square tree))
+
+; Exercise 2.32
+
+(define (subsets s)
+  (if (null? s)
+      (list nil)
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (n)
+                            (cons (car s) n)) rest)))))
+
+; Exercise 2.33
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+
+(define (my-map p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) nil sequence))
+(define (my-append seq1 seq2)
+  (accumulate cons seq2 seq1))
+(define (my-length sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+; Exercise 2.34
+
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms)
+                (+ this-coeff (* x higher-terms)))
+              0
+              coefficient-sequence))
+
+; Exercise 2.35
+(define (count-leaves t)
+  (accumulate + 0
+              (map (lambda (sub-tree)
+                     (cond ((not (pair? sub-tree)) 1)
+                           (else (count-leaves sub-tree)))) t)))
+
+; Exercise 2.36
+
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      nil
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
